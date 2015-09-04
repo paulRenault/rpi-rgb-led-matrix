@@ -66,10 +66,10 @@ void ImageScroller::Run() {
             matrix_->transformer()->Transform(offscreen_)->SetPixel(x, y, p.red, p.green, p.blue);
           }else if(
             //Horizontal check
-            (x>=(current_image_.width-horizontal_position_) && x<=(screen_width-horizontal_position_)) ||
+            (x>=(current_image_.width-horizontal_position_) && x<(screen_width-horizontal_position_)) ||
             (x>=(screen_width+current_image_.width-horizontal_position_)) ||
             //Vertical check
-            (y>=(current_image_.height-vertical_position_) && y<=(screen_height-vertical_position_)) ||
+            (y>=(current_image_.height-vertical_position_) && y<(screen_height-vertical_position_)) ||
             (y>=(screen_height+current_image_.height-vertical_position_))
           ){
             matrix_->transformer()->Transform(offscreen_)->SetPixel(x, y, 0, 0, 0);
