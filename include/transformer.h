@@ -21,25 +21,25 @@
 #include <cstddef>
 
 #include "canvas.h"
-
+enum led_matrix_orientation {HORIZONTAL=0,VERTICAL=270,VERTICAL_UPSIDE_DOWN=90,HORIZONTAL_UPSIDE_DOWN=180};
 namespace rgb_matrix {
 
 // Transformer for RotateCanvas
 class RotateTransformer : public CanvasTransformer {
 public:
-  RotateTransformer(int angle = 0);
+  RotateTransformer(led_matrix_orientation angle = HORIZONTAL);
   virtual ~RotateTransformer();
 
-  void SetAngle(int angle);
-  inline int angle() { return angle_; }
-  
+  void SetAngle(led_matrix_orientation angle);
+  inline led_matrix_orientation angle() { return angle_; }
+
   virtual Canvas *Transform(Canvas *output);
 
 private:
   // Transformer canvas to rotate the input canvas in 90° steps
   class TransformCanvas;
 
-  int angle_;
+  led_matrix_orientation angle_;
   TransformCanvas *const canvas_;
 };
 
@@ -49,7 +49,7 @@ private:
 class LinkedTransformer : public CanvasTransformer {
 public:
   typedef std::vector<CanvasTransformer*> List;
-  
+
   LinkedTransformer() {}
   LinkedTransformer(List transformer_list) : list_(transformer_list) {}
 

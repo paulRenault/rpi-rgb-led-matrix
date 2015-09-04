@@ -1,5 +1,7 @@
-CXXFLAGS=-Wall -O3 -g
-OBJECTS=demo-main.o minimal-example.o text-example.o led-image-viewer.o
+CXXFLAGS=-Wall -g
+#-O3
+LED_MATRIX_OBJECTS = main.o colorPulseGenerator.o brightnessPulseGenerator.o simpleSquare.o grayScaleBlock.o rotatingBlockGenerator.o imageScroller.o
+OBJECTS=$(LED_MATRIX_OBJECTS) minimal-example.o text-example.o led-image-viewer.o
 BINARIES=led-matrix minimal-example text-example
 ALL_BINARIES=$(BINARIES) led-image-viewer
 
@@ -22,8 +24,8 @@ all : $(BINARIES)
 $(RGB_LIBRARY): FORCE
 	$(MAKE) -C $(RGB_LIBDIR)
 
-led-matrix : demo-main.o $(RGB_LIBRARY)
-	$(CXX) $(CXXFLAGS) demo-main.o -o $@ $(LDFLAGS)
+led-matrix : $(LED_MATRIX_OBJECTS) $(RGB_LIBRARY)
+	$(CXX) $(CXXFLAGS) $(LED_MATRIX_OBJECTS) -o $@ $(LDFLAGS)
 
 minimal-example : minimal-example.o $(RGB_LIBRARY)
 	$(CXX) $(CXXFLAGS) minimal-example.o -o $@ $(LDFLAGS)

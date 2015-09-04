@@ -25,10 +25,10 @@ namespace rgb_matrix {
 /*****************************/
 class RotateTransformer::TransformCanvas : public Canvas {
 public:
-  TransformCanvas(int angle);
+  TransformCanvas(led_matrix_orientation angle);
 
   void SetDelegatee(Canvas* delegatee);
-  void SetAngle(int angle);
+  void SetAngle(led_matrix_orientation angle);
 
   virtual int width() const;
   virtual int height() const;
@@ -38,7 +38,7 @@ public:
 
 private:
   Canvas *delegatee_;
-  int angle_;
+  led_matrix_orientation angle_;
   float pivot_x_;
   float pivot_y_;
   int cos_;
@@ -47,7 +47,7 @@ private:
   int offset_y_;
 };
 
-RotateTransformer::TransformCanvas::TransformCanvas(int angle)
+RotateTransformer::TransformCanvas::TransformCanvas(led_matrix_orientation angle)
   : delegatee_(NULL) {
   SetAngle(angle);
 }
@@ -60,6 +60,7 @@ void RotateTransformer::TransformCanvas::SetDelegatee(Canvas* delegatee) {
 
 void RotateTransformer::TransformCanvas::SetPixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue) {
   // translate point to origin
+  /*
   x -= pivot_x_;
   y -= pivot_y_;
 
@@ -69,42 +70,56 @@ void RotateTransformer::TransformCanvas::SetPixel(int x, int y, uint8_t red, uin
   // translate back
   x = rot_x + pivot_x_ + offset_x_;
   y = rot_y + pivot_y_ + offset_y_;
-
+  */
+  int tmpX = x;
+  int tmpY = y;
+  switch (angle_){
+    case VERTICAL_UPSIDE_DOWN:
+      x=delegatee_->width() - tmpY - 1 ;
+      y=tmpX;
+      break;
+    case VERTICAL:
+      x=tmpY;
+      y=delegatee_->height() - tmpX - 1;
+      break;
+  }
   delegatee_->SetPixel(x, y, red, green, blue);
 }
 
-int RotateTransformer::TransformCanvas::width() const { 
-  return (angle_ % 180 == 0) ? delegatee_->width() : delegatee_->height();
+int RotateTransformer::TransformCanvas::width() const {
+  return (angle_ % HORIZONTAL_UPSIDE_DOWN == 0) ? delegatee_->width() : delegatee_->height();
 }
 
-int RotateTransformer::TransformCanvas::height() const { 
-  return (angle_ % 180 == 0) ? delegatee_->height() : delegatee_->width();
+int RotateTransformer::TransformCanvas::height() const {
+  return (angle_ % HORIZONTAL_UPSIDE_DOWN == 0) ? delegatee_->height() : delegatee_->width();
 }
 
-void RotateTransformer::TransformCanvas::Clear() { 
-  delegatee_->Clear(); 
+void RotateTransformer::TransformCanvas::Clear() {
+  delegatee_->Clear();
 }
 
 void RotateTransformer::TransformCanvas::Fill(uint8_t red, uint8_t green, uint8_t blue) {
   delegatee_->Fill(red, green, blue);
 }
 
-void RotateTransformer::TransformCanvas::SetAngle(int angle) {
-  assert(angle % 90 == 0);  // We currenlty enforce that for more pretty output
-  angle_ = angle % 360;
+void RotateTransformer::TransformCanvas::SetAngle(led_matrix_orientation angle) {
+  assert(angle % VERTICAL_UPSIDE_DOWN == 0);  // We currenlty enforce that for more pretty output
+  angle_ = angle; //% 360;
 
-  sin_ = (angle_ ==  90 ?  1 : (angle_ == 270 ? -1 : 0));
-  cos_ = (angle_ == 180 ? -1 : (angle_ ==   0 ?  1 : 0));
+/*
+  sin_ = (angle_ ==  VERTICAL_UPSIDE_DOWN ?  1 : (angle_ == VERTICAL ? -1 : 0));
+  cos_ = (angle_ == HORIZONTAL_UPSIDE_DOWN ? -1 : (angle_ ==   0 ?  1 : 0));
 
   // Offset needed cause of little precision errors on 180° and 270°
-  offset_x_ = (angle_ == 90 || angle_ == 180 ? 1 : 0);
-  offset_y_ = (angle_ == 180 || angle_ == 270 ? 1 : 0);
+  offset_x_ = (angle_ == VERTICAL_UPSIDE_DOWN || angle_ == HORIZONTAL_UPSIDE_DOWN ? 1 : 0);
+  offset_y_ = (angle_ == HORIZONTAL_UPSIDE_DOWN || angle_ == VERTICAL ? 1 : 0);
+*/
 }
 
 /**********************/
 /* Rotate Transformer */
 /**********************/
-RotateTransformer::RotateTransformer(int angle)
+RotateTransformer::RotateTransformer(led_matrix_orientation angle)
   : angle_(angle), canvas_(new TransformCanvas(angle)) {
 }
 
@@ -119,7 +134,7 @@ Canvas *RotateTransformer::Transform(Canvas *output) {
   return canvas_;
 }
 
-void RotateTransformer::SetAngle(int angle) {
+void RotateTransformer::SetAngle(led_matrix_orientation angle) {
   canvas_->SetAngle(angle);
   angle_ = angle;
 }
@@ -180,20 +195,20 @@ void LargeSquare64x64Transformer::TransformCanvas::SetDelegatee(Canvas* delegate
   delegatee_ = delegatee;
 }
 
-void LargeSquare64x64Transformer::TransformCanvas::Clear() { 
-  delegatee_->Clear(); 
+void LargeSquare64x64Transformer::TransformCanvas::Clear() {
+  delegatee_->Clear();
 }
 
 void LargeSquare64x64Transformer::TransformCanvas::Fill(uint8_t red, uint8_t green, uint8_t blue) {
   delegatee_->Fill(red, green, blue);
 }
 
-int LargeSquare64x64Transformer::TransformCanvas::width() const { 
-  return 64; 
+int LargeSquare64x64Transformer::TransformCanvas::width() const {
+  return 64;
 }
 
-int LargeSquare64x64Transformer::TransformCanvas::height() const { 
-  return 64; 
+int LargeSquare64x64Transformer::TransformCanvas::height() const {
+  return 64;
 }
 
 void LargeSquare64x64Transformer::TransformCanvas::SetPixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue) {
@@ -219,7 +234,7 @@ LargeSquare64x64Transformer::~LargeSquare64x64Transformer() {
 
 Canvas *LargeSquare64x64Transformer::Transform(Canvas *output) {
   assert(output != NULL);
-  
+
   canvas_->SetDelegatee(output);
   return canvas_;
 }
