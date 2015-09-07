@@ -51,7 +51,9 @@ static int usage(const char *progname) {
           "\t-t <seconds>  : Run for these number of seconds, then exit.\n"
           "\t                (if neither -d nor -t are supplied, waits for <RETURN>)\n"
           "\t-b <brightnes>: Sets brightness percent. Default: 100.\n"
-          "\t-R <rotation> : Sets the rotation of matrix. Allowed: 0, 90, 180, 270. Default: 0.\n");
+          "\t-R <rotation> : Sets the rotation of matrix. Allowed: 0, 90, 180, 270. Default: 0.\n"
+		  "\t-o <orientation> : 0 for horizontal & 1 for vertical\n"
+		  "\t-v				: repeat the image if it is smaller than the screen size\n");
   fprintf(stderr, "Demos, choosen with -D\n");
   fprintf(stderr, "\t0  - some rotating square\n"
           "\t1  - forward scrolling an image (-m <scroll-ms>)\n"
